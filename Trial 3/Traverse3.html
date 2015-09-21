@@ -1,0 +1,40 @@
+<!DOCTYPE hmtl>
+<html>
+<head>
+	<script type = "text/JavaScript" src = "jquery-2.1.0.min.js"></script>
+	<style type = "text/css">
+		.canvas {
+			height : 600px;
+			width : 1000px;
+			margin : 3px;
+			border : solid red 1px;
+			position : absolute;
+		}
+		#toolContainer {
+			position : fixed;
+			right : 5px;
+			top : 3px;
+		}
+		#baseCanvas {
+			z-index : 0;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id = "baseCanvas" class = "canvas" height = "600px" width = "1000px" usemap = "#testMap"></canvas>
+	<canvas id = "travelCanvas" class = "canvas" height = "600px" width = "1000px"></canvas>
+	<canvas id = "finalCanvas" class = "canvas" height = "600px" width = "1000px"></canvas>
+	
+	<div id = "toolContainer">
+	</div>
+	
+	<map name = "testMap">
+		<area shape = "rect" coords = "100,100,200,200" title = "working!"/>
+	</map>
+	
+<script type = "text/JavaScript" src = "funcLibrary.js"></script>
+<script type = "text/JavaScript" src = "traverseScript.js"></script>
+<script type = "text/JavaScript" src = "planGenerator.js"></script>
+</body>
+</html>
