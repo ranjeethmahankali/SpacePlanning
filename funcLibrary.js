@@ -75,8 +75,6 @@ function HSLtoHex(h, s, l){
    return "#" + componentToHex(Math.round(r * 255)) + componentToHex(Math.round(g * 255)) + componentToHex(Math.round(b * 255));
 }
 
-<<<<<<< HEAD
-=======
 function hexToRgb(hex) {
 			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 			return result ? {
@@ -84,9 +82,8 @@ function hexToRgb(hex) {
 				g: parseInt(result[2], 16),
 				b: parseInt(result[3], 16)
 			} : null;
-		}
+}
 
->>>>>>> gh-pages
 function mod(vec){//gives the modulus of a vector
 	var r = Math.sqrt((vec[0]*vec[0])+(vec[1]*vec[1]));
 	return r;
