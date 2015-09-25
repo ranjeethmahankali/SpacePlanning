@@ -152,7 +152,7 @@ function renderCanvas(){//renders all the spaces by looping through the sapces a
 }
 
 function space(name, mSpan, totAr, color){//constructor for "space" object
-	spaces.push(this);
+	//spaces.push(this);
 	this.name = name;//this is just a string with the name of the space
 	this.nodes = [];
 	this.runs = [];//[4,5,50]
@@ -160,6 +160,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 	this.relations = [];
 	this.negAnchor = [];//point anchors of this space if any
 	this.maxNegAnchors = 2000;
+	this.prefIndex;
 	
 	this.meanSpan = mSpan;//this is the preferred mean span
 	this.span = this.meanSpan;//this is the default or current span
@@ -314,7 +315,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		console.log('getNbr failed because headPos unknown');
 	}}
 	
-	this.align = function(){
+	this.align = function(showRoughWork){
 		var p = this.headPos;
 		var nb = this.getNbrs();
 		var stp = 2;
@@ -322,11 +323,13 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		var clearPrev = [];
 		gradLoop: for(var itr=0; true; itr++){//console.log(p, uSum);
 			var uSum = uSum2(p,this,nb);//console.log(p, uSum);
-			/*fc.beginPath();
-			fc.moveTo(p[0],p[1]);
-			fc.lineTo(p[0]+stp*uSum[0],p[1]+stp*uSum[1]);
-			fc.closePath();
-			fc.stroke();*/
+			if(showRoughWork){
+				fc.beginPath();
+				fc.moveTo(p[0],p[1]);
+				fc.lineTo(p[0]+stp*uSum[0],p[1]+stp*uSum[1]);
+				fc.closePath();
+				fc.stroke();
+			}
 		
 			if(itr > 5000){console.log('Aligning '+this.name+' head failed. More than '+itr+' Iterations required');break;}
 			
@@ -641,7 +644,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		
 	}
 	
-	this.reAlign = function(){
+	this.reAlign = function(showRoughWork){
 		var p = this.headPos;
 		var stp = 2;
 		var rn,otherSn,otherRn;
@@ -665,11 +668,13 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		var clearPrev = [];
 		gradLoop: for(var itr=0; true; itr++){
 			var uSum = uSumSelf(p,this,rn,otherSn,otherRn);
-			/*fc.beginPath();
-			fc.moveTo(p[0],p[1]);
-			fc.lineTo(p[0]+stp*uSum[0],p[1]+stp*uSum[1]);
-			fc.closePath();
-			fc.stroke();*/
+			if(showRoughWork){
+				fc.beginPath();
+				fc.moveTo(p[0],p[1]);
+				fc.lineTo(p[0]+stp*uSum[0],p[1]+stp*uSum[1]);
+				fc.closePath();
+				fc.stroke();
+			}
 			
 			if(mod(vDiff(p,this.lastPosCritPt)) > 700){stp = 20;}else{stp = 2;}
 			if(itr > 2000){console.log('Aligning '+this.name+' head failed. More than '+itr+' Iterations required');break;}
@@ -711,18 +716,29 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 	}
 	
 	this.calculatePI = function(){
-		//var PI = ;
+		var posRelNum = 0;//number of positive relations this space has
+		
+		for(var s=0; s<spaces.length; s++){
+			if(spaces[s] == this){continue;}
+			if(this.rel(spaces[s]) > 0){
+				posRelNum++;
+			}else if(this.rel(spaces[s]) < 0){
+				posRelNum--;
+			}
+		}
+		
+		this.prefIndex = this.sqrns*posRelNum;//*this.totArea;
 	}
 	
-	this.critPt = function(){return critPt(this);}
-	this.lastCritPt = this.critPt();
-	this.posCritPt = function(){return posCritPt(this);}
-	this.lastPosCritPt = this.posCritPt();
+	this.critPt = function(showRoughWork){return critPt(this,showRoughWork);}
+	this.lastCritPt = this.critPt(false);
+	this.posCritPt = function(showRoughWork){return posCritPt(this, showRoughWork);}
+	this.lastPosCritPt = this.posCritPt(false);
 	this.rel = function(spc){return rel(spc,this);}
 	this.addRel = function(spc,rF){addRel(spc,this,rF);}
 	this.isClear = function(){return headIsClear(this.headPos,this.span);}
-	this.placeHead = function(shwCritPt){placeHead(this,shwCritPt);}
-	this.moveHead = function(){moveHead(this);}
+	this.placeHead = function(shwCritPt,showRoughWork){placeHead(this,shwCritPt, showRoughWork);}
+	this.moveHead = function(showRoughWork){moveHead(this);}
 }
 
 function uSum(xx, yy, spc){
@@ -952,7 +968,7 @@ function uSumSelf(p,spc,l,othSn,othRn){
 	return vecSum;
 }
 
-function critPt(spc){//calculates the critical point and moves the drawing head to that point
+function critPt(spc,showRoughWork){//calculates the critical point and moves the drawing head to that point
 	//this is for measuring the runtime of the function
 	//var date = new Date();
 	//var t1 = (1000*date.getSeconds())+date.getMilliseconds();
@@ -986,11 +1002,13 @@ function critPt(spc){//calculates the critical point and moves the drawing head 
 	//sconsole.log([x,y]);
 	var uSumPrev = [];
 	for(var itr=0; itr < 500; itr++ ){
-		/*fc.beginPath();
-		fc.moveTo(x,y);
-		fc.lineTo(x+stp*uSum(x,y,spc)[0],y+stp*uSum(x,y,spc)[1]);
-		fc.closePath();
-		fc.stroke();*/
+		if(showRoughWork){
+			fc.beginPath();
+			fc.moveTo(x,y);
+			fc.lineTo(x+stp*uSum(x,y,spc)[0],y+stp*uSum(x,y,spc)[1]);
+			fc.closePath();
+			fc.stroke();
+		}
 		var uS = uSum(x,y,spc);
 		x += stp*uS[0];
 		y += stp*uS[1];
@@ -1020,7 +1038,7 @@ function critPt(spc){//calculates the critical point and moves the drawing head 
 	return [x,y];
 }
 
-function posCritPt(spc){//calculates the critical point and moves the drawing head to that point but only considers positive relations
+function posCritPt(spc, showRoughWork){//calculates the critical point and moves the drawing head to that point but only considers positive relations
 	//this is for measuring the runtime of the function
 	//var date = new Date();
 	//var t1 = (1000*date.getSeconds())+date.getMilliseconds();
@@ -1053,11 +1071,13 @@ function posCritPt(spc){//calculates the critical point and moves the drawing he
 	//console.log([x,y]);
 	var uSumPrev = [];
 	for(var itr=0; itr < 500; itr++ ){
-		/*tc.beginPath();
-		tc.moveTo(x,y);
-		tc.lineTo(x+stp*uSum(x,y,spc)[0],y+stp*uSum(x,y,spc)[1]);
-		tc.closePath();
-		tc.stroke();*/
+		if(showRoughWork){
+			tc.beginPath();
+			tc.moveTo(x,y);
+			tc.lineTo(x+stp*uSum(x,y,spc)[0],y+stp*uSum(x,y,spc)[1]);
+			tc.closePath();
+			tc.stroke();
+		}
 		var uS = uSumPos(x,y,spc);
 		x += stp*uS[0];
 		y += stp*uS[1];
@@ -1090,33 +1110,20 @@ function posCritPt(spc){//calculates the critical point and moves the drawing he
 function addRel(a,b,rF){//adds relation ship factor rF between spaces a and b
 	//console.log(rF);
 	if(rF <= 5 && rF >= -5){
-		if(spaces.indexOf(a) > spaces.indexOf(b)){
-			b.relations[a.name] = rF;
-		}else if(spaces.indexOf(a) < spaces.indexOf(b)){
-			a.relations[b.name] = rF;
-		}else{
-			console.log('addRel('+a+','+b+') failed !');
-		}
+		b.relations[a.name] = rF;
+		a.relations[b.name] = rF;
 	}else{
 		console.log('Add Relation Failed due to out of domain rF value = '+ rF);
 	}
 }
 
 function rel(a,b){//returns the relation ship factor between spaces a and b
-	if(spaces.indexOf(a) > spaces.indexOf(b)){
-		if(b.relations[a.name]){
-			return b.relations[a.name];
-		}else{
-			return 0;
-		}
-	}else if(spaces.indexOf(a) < spaces.indexOf(b)){
-		if(a.relations[b.name]){
-			return a.relations[b.name];
-		}else{
-			return 0;
-		}
-	}else if(spaces.indexOf(a) == spaces.indexOf(b)){
+	if(spaces.indexOf(a) == spaces.indexOf(b)){
 		return slefRelFactor;//change later for the self relation value
+	}else if(typeof b.relations[a.name] === 'undefined'){
+		return 0;
+	}else{
+		return b.relations[a.name];
 	}
 }
 
@@ -1249,14 +1256,14 @@ function headIsConnected(spc){if(spc.headPos.length){//tiny spaces can miss thro
 	}
 }
 
-function placeHead(spc,shwCritPt){//places the head of spc at the nearest possible point from pos
+function placeHead(spc, shwCritPt, showRoughWork){//places the head of spc at the nearest possible point from pos//2nd and 3rd parameters are bools whether to show roughwork or not
 	var maxIter = 200;
 	var i = 0;//while loop variable
 	while(i < maxIter){
-		if(shwCritPt){markPt(spc.critPt(),fc);}else{spc.critPt();}
+		if(shwCritPt){markPt(spc.critPt(showRoughWork),fc);}else{spc.critPt(showRoughWork);}
 		//console.log(spc.critPt());
 		//spc.critPt();
-		spc.align();
+		spc.align(showRoughWork);
 		//console.log(spc.headPos,headIsClear(spc.headPos,spc.span));
 		if(headIsClear(spc.headPos,spc.span)){
 			//console.log('Aligned after '+(i+1)+' attempts !');
@@ -1270,7 +1277,7 @@ function placeHead(spc,shwCritPt){//places the head of spc at the nearest possib
 			}else{//console.log('No at '+spc.span);
 				//console.log(spc.span+' - '+spDiff);
 				spc.span -= spDiff;
-				spc.align();
+				spc.align(showRoughWork);
 	
 				while(spDiff >= 1){
 					if(headIsClear(spc.headPos,spc.span)){//console.log('Yes at '+spc.span);
@@ -1291,7 +1298,7 @@ function placeHead(spc,shwCritPt){//places the head of spc at the nearest possib
 							spc.span -= spDiff;
 						}	
 					}
-					spc.align();
+					spc.align(showRoughWork);
 				}
 			}
 		}
@@ -1309,10 +1316,10 @@ function placeHead(spc,shwCritPt){//places the head of spc at the nearest possib
 				//console.log(locA[lc][1],locA[lc][4],0.5*spDiff);
 				if(locA[lc][4] <= spDiff){
 					spc.span += growF*locA[lc][4];//console.log(spc.span);
-					spc.align();//console.log(spc.span);
+					spc.align(showRoughWork);//console.log(spc.span);
 					if(!headIsClear(spc.headPos,spc.span)){
 						spc.span -= locA[lc][4]; 
-						spc.align();
+						spc.align(showRoughWork);
 						break;
 					};
 				}
@@ -1321,7 +1328,7 @@ function placeHead(spc,shwCritPt){//places the head of spc at the nearest possib
 	}
 }
 
-function moveHead(spc){
+function moveHead(spc, showRoughWork){
 	//place head at the new updated critPt
 	//align it toward the nearest self neighbour
 	//If it doesn't connect with it after the align loop ends, try the second nearest neighbour
@@ -1331,8 +1338,8 @@ function moveHead(spc){
 	while(i < maxIter){
 		//markPt(spc.critPt(),fc);
 		//console.log(spc.critPt());
-		spc.critPt();
-		spc.reAlign();
+		spc.critPt(showRoughWork);
+		spc.reAlign(showRoughWork);
 		
 		if(headIsClear(spc.headPos,spc.span) && headIsConnected(spc)){
 			//console.log('Aligned after '+(i+1)+' attempts !');
@@ -1345,7 +1352,7 @@ function moveHead(spc){
 			}else{//console.log('No at '+spc.span);
 				//console.log(spc.span+' - '+spDiff);
 				spc.span -= spDiff;
-				spc.reAlign();
+				spc.reAlign(showRoughWork);
 	
 				while(spDiff >= 1){
 					if(headIsClear(spc.headPos,spc.span)  && headIsConnected(spc)){//console.log('Yes at '+spc.span);
@@ -1365,7 +1372,7 @@ function moveHead(spc){
 							spc.span -= spDiff;
 						}	
 					}
-					spc.reAlign();
+					spc.reAlign(showRoughWork);
 				}
 			}
 		}
@@ -1385,10 +1392,10 @@ function moveHead(spc){
 				//console.log(locA[lc][1],locA[lc][4],0.5*spDiff);
 				if(locA[lc][4] <= spDiff){
 					spc.span += growF*locA[lc][4];//console.log(spc.span);
-					spc.reAlign();//console.log(spc.span);
+					spc.reAlign(showRoughWork);//console.log(spc.span);
 					if(!headIsClear(spc.headPos,spc.span)){
 						spc.span -= locA[lc][4]; 
-						spc.reAlign();
+						spc.reAlign(showRoughWork);
 						break;
 					};
 				}
@@ -1397,20 +1404,21 @@ function moveHead(spc){
 	}
 }
 
-function planSpace(spc,rNum,shwCritPt){//plans space spc but only rNum runs
-	spc.posCritPt();
+function planSpace(spc,rNum,shwCritPt, showRoughWork){//plans space spc but only rNum runs
+	spc.posCritPt(showRoughWork);
 	//spc.hPos.push(spc.critPt());
-	spc.placeHead(shwCritPt);
+	spc.placeHead(shwCritPt, showRoughWork);
 	//travelling loop begins
 	spc.travel();
 	var lv = 0;
 	while(spc.areaCheck() && lv < rNum-1){
 		//fc.fillRect(spc.headPos[0]-0.5*spc.span, spc.headPos[1]-0.5*spc.span, spc.span, spc.span);
-		spc.moveHead();
+		spc.moveHead(showRoughWork);
 		spc.travel();
 		lv++;
 		//renderCanvas();
 	}
+	console.log('Finished Planning '+spc.name);
 	//if(shwCritPt){fc.fillRect(spc.headPos[0]-0.5*spc.span, spc.headPos[1]-0.5*spc.span, spc.span, spc.span);}
 }
 
