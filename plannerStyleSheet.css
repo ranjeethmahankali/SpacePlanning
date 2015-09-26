@@ -1,0 +1,48 @@
+body{
+	margin : 0px;
+	padding : 0px;
+}
+.canvas {
+	height : 600px;
+	width : 1000px;
+	margin : 2px;
+	border : solid red 1px;
+	position : absolute;
+}
+#toolContainer {
+	position : fixed;
+	left  : 1006px;
+	top : 2px;
+	width : 350px;
+}
+#baseCanvas {
+	z-index : 0;
+}
+#toolCanvas {
+	height : 350px;
+	width : 350px;
+	margin : 0px;
+	border : solid red 1px;
+}
+#help_text{
+	text-align : center;
+	bottom : 0px;
+	width : 340px;
+	border : solid #b8b8b8 1px;
+	padding : 5px;
+}
+#addSpaceForm{
+	width : 350px;
+	margin : 0px;
+	border : solid #b8b8b8 1px;
+	text-align : right;
+}
+#spaceName{
+	width : 100px;
+}
+#spaceSize, #spaceArea{
+	width : 50px;
+}
+.formElements{
+	margin : 5px;
+}

@@ -2,23 +2,7 @@
 <html>
 <head>
 	<script type = "text/JavaScript" src = "jquery-2.1.0.min.js"></script>
-	<style type = "text/css">
-		.canvas {
-			height : 600px;
-			width : 1000px;
-			margin : 3px;
-			border : solid red 1px;
-			position : absolute;
-		}
-		#toolContainer {
-			position : fixed;
-			right : 5px;
-			top : 3px;
-		}
-		#baseCanvas {
-			z-index : 0;
-		}
-	</style>
+	<link type="text/css" href = "plannerStyleSheet.css" rel = "stylesheet"></link>
 </head>
 
 <body>
@@ -27,6 +11,16 @@
 	<canvas id = "finalCanvas" class = "canvas" height = "600px" width = "1000px"></canvas>
 	
 	<div id = "toolContainer">
+		<canvas id = "toolCanvas" class = "toolCanvas" height = "350px" width = "350px"></canvas>
+		<p id = "help_text">This is the help text</p>
+		<div id = "addSpaceForm">
+			Name: <input type="text" name="spaceName" id="spaceName" class="formElements"/><br />
+			Mean Span: <input type="text" name="spaceSize" id="spaceSize" class="formElements"/><br />
+			Total Area: <input type="text" name="spaceArea" id="spaceArea" class="formElements"/><br />
+			Color: <input type="color" name="spaceColor" id="spaceColor" class="formElements"/><br />
+			
+			<button id = "createSpaceBtn" class="formElements">Create Space</button>
+		</div>
 	</div>
 	
 	<map name = "testMap">
