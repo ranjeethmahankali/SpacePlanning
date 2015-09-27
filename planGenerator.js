@@ -38,32 +38,24 @@ var date = new Date();
 var t1 = 1000*date.getSeconds() + date.getMilliseconds();
 //Planning Starts
 //for(var s in spaces){console.log(spaces[s].name);}
-sortSpaces();
-for(var s in spaces){console.log(spaces[s].name, spaces[s].prefIndex);}
+function runPlanner(){
+	sortSpaces();
+	//for(var s in spaces){console.log(spaces[s].name, spaces[s].prefIndex);}
+	var runLength = spaces[0].totArea/spaces[0].meanSpan;//console.log(runLength);
+	var planCenter = [450,250];
+	var e1 = vDiff(planCenter, [runLength/2,0]);
+	var e2 = vSum(planCenter, [runLength/2,0]);
 
-var runLength = spaces[0].totArea/spaces[0].meanSpan;//console.log(runLength);
-var planCenter = [450,250];
-var e1 = vDiff(planCenter, [runLength/2,0]);
-var e2 = vSum(planCenter, [runLength/2,0]);
+	//console.log(e1,e2);
 
-//console.log(e1,e2);
+	spaces[0].nodes = [e1,e2];
+	spaces[0].runs = [[0,1,spaces[0].meanSpan]];
 
-spaces[0].nodes = [e1,e2];
-spaces[0].runs = [[0,1,spaces[0].meanSpan]];
-
-for(var spcNum = 1; spcNum < spaces.length; spcNum++){
-	planSpace(spaces[spcNum],10, false, false);
+	for(var spcNum = 1; spcNum < spaces.length; spcNum++){
+		planSpace(spaces[spcNum],10, false, false);
+	}
+	renderCanvas();
 }
-
-// planSpace(spaces[1],10,false);
-// planSpace(spaces[2],10,false);
-// planSpace(spaces[3],10,false);
-//planSpace(B,10,false);
-// planSpace(A,10,false);
-// planSpace(C,10,false);
-// planSpace(D,10,false);
-renderCanvas();
-//Planning Ends
 date = new Date();
 var t2 = 1000*date.getSeconds() + date.getMilliseconds();
 console.log('Runtime : '+(t2-t1)+' ms');
