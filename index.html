@@ -15,17 +15,17 @@
 		<button id = "runPlannerBtn" class="formElements" onclick="runPlanner()">Plan these Spaces</button>
 		<p id = "help_text">This is the help text</p>
 		<div id = "addSpaceForm">
-			Name: <input type="text" name="spaceName" id="spaceName" class="formElements"/><br />
-			Mean Span: <input type="text" name="spaceSize" id="spaceSize" class="formElements"/><br />
-			Total Area: <input type="text" name="spaceArea" id="spaceArea" class="formElements"/><br />
+			Name: <input type="text" name="spaceName" id="spaceName" class="formElements" maxlength = "20"/><br />
+			Mean Span: <input type="text" name="spaceSize" id="spaceSize" class="formElements" maxlength = "20"/><br />
+			Total Area: <input type="text" name="spaceArea" id="spaceArea" class="formElements" maxlength = "20"/><br />
 			Color: <input type="color" name="spaceColor" id="spaceColor" class="formElements"/><br />
 			
-			<button id = "createSpaceBtn" class="formElements">Create Space</button>
+			<button id = "createSpaceBtn" class="formElements" onclick  = "addSpace()">Create Space</button>
 		</div>
 	</div>
 	
 	<map name = "testMap">
-		<area shape = "rect" coords = "100,100,200,200" title = "working!"/>
+		<area shape = "rect" coords = "100,100,200,200" title = "createSpace"/>
 	</map>
 	
 <script type = "text/JavaScript" src = "funcLibrary.js"></script>

@@ -10,7 +10,7 @@ body{
 	position : absolute;
 }
 #toolContainer {
-	position : fixed;
+	position : absolute;
 	left  : 1006px;
 	top : 2px;
 	width : 350px;
