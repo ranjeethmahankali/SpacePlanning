@@ -20,7 +20,7 @@ fc.lineWidth = 1;
 var reductionFactor = 0.1;
 var negAnchFactor = 0.2;
 var minLinkSize = 30;
-var slefRelFactor = 1;
+var selfRelFactor = 1;
 var minGridSize = 5;
 
 function lineSum(s,l,p){//attrction of the run s,l on position p
@@ -158,6 +158,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 	this.runs = [];//[4,5,50]
 	this.color = color;//color to render the room in the viewport
 	this.relations = [];
+	this.relationsOriginal = [];
 	this.negAnchor = [];//point anchors of this space if any
 	this.maxNegAnchors = 2000;
 	this.prefIndex;
@@ -172,7 +173,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 	
 	this.sqrns = this.meanSpan*this.meanSpan/this.totArea;
 	
-	this.runArea = function(rN){
+	this.runArea = function(rN){//retunrs the area of a single run
 		var e1 = [],e2 = [];
 		e1 = this.nodes[this.runs[rN][0]];
 		e2 = this.nodes[this.runs[rN][1]];
@@ -182,7 +183,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		return area;
 	}
 	
-	this.area = function(){
+	this.area = function(){//returns the total area - currently drawn
 		var area = 0;
 		for(var l = 0; l < this.runs.length; l++){
 			area += this.runArea(l);
@@ -191,7 +192,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 		return area;
 	}
 	
-	this.areaCheck = function(){
+	this.areaCheck = function(){//compares currently drawn area with the area requirement i.e. totArea
 		areaError = 1;//flexibility in area
 		if(this.totArea > this.area() && this.totArea-this.area() > areaError){
 			return true;
@@ -1119,11 +1120,33 @@ function addRel(a,b,rF){//adds relation ship factor rF between spaces a and b
 
 function rel(a,b){//returns the relation ship factor between spaces a and b
 	if(spaces.indexOf(a) == spaces.indexOf(b)){
-		return slefRelFactor;//change later for the self relation value
+		return selfRelFactor;//change later for the self relation value
 	}else if(typeof b.relations[a.name] === 'undefined'){
 		return 0;
 	}else{
 		return b.relations[a.name];
+	}
+}
+
+function addRelOriginal(a,b,rF){//adds relation ship factor rF between spaces a and b
+	//console.log(rF);
+	if(rF <= 5 && rF >= -5){
+		b.relations[a.name] = rF;
+		a.relations[b.name] = rF;
+		b.relationsOriginal[a.name] = rF;
+		a.relationsOriginal[b.name] = rF;
+	}else{
+		console.log('Add Relation Failed due to out of domain rF value = '+ rF);
+	}
+}
+
+function relOriginal(a,b){//returns the relation ship factor between spaces a and b
+	if(spaces.indexOf(a) == spaces.indexOf(b)){
+		return selfRelFactor;//change later for the self relation value
+	}else if(typeof b.relationsOriginal[a.name] === 'undefined'){
+		return 0;
+	}else{
+		return b.relationsOriginal[a.name];
 	}
 }
 

@@ -12,13 +12,16 @@ body{
 #toolContainer {
 	position : absolute;
 	left  : 1006px;
-	top : 2px;
+	top : 352px;
 	width : 350px;
 }
 #baseCanvas {
 	z-index : 0;
 }
-#toolCanvas {
+.canvas2 {
+	position : absolute;
+	top : 2px;
+	left : 1006px;
 	height : 350px;
 	width : 350px;
 	margin : 0px;
