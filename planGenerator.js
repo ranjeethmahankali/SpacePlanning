@@ -127,6 +127,8 @@ function resetSpace(sp){//resets the space sp to it's original condition that it
 	
 	sp.headPos = [];//position of the drawing head
 	sp.hPos = [];//array of various head Positions while planning and mving around
+	sp.lastCritPt = null;
+	sp.posCritPt = null;
 }
 
 function markSpaces(){//marks spaces with bubbles on toolCanvas
