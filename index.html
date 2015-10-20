@@ -21,6 +21,8 @@
 			</tr>
 		</table>
 		<canvas id = "relCanvas" class = "canvas2" height = "350px" width = "350px"></canvas>
+		<img src = "empty.png" id="relCanvas" usemap = "#relMap" class="canvas2"/>
+		<map name = "relMap" id = "relMap"></map>
 	</div>
 	
 	<div id = "toolContainer">
@@ -35,10 +37,6 @@
 			<button id = "createSpaceBtn" class="formElements" onclick  = "addSpace()">Create Space</button>
 		</div>
 	</div>
-	
-	<map name = "testMap">
-		<area shape = "rect" coords = "100,100,200,200" title = "createSpace"/>
-	</map>
 	
 <script type = "text/JavaScript" src = "funcLibrary.js"></script>
 <script type = "text/JavaScript" src = "traverseScript.js"></script>

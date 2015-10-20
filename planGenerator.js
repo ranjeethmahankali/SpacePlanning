@@ -47,6 +47,21 @@ function loadMouseEventHandlers(){
 		var index = Number(this.id);
 		spaces[index].color = $(this).val();
 	});
+	
+	$('.relMapBubble').click(function(){
+		var r = Number(this.id);
+		
+		var s1 = relBubbles[r].s1;
+		var s2 = relBubbles[r].s2;
+		
+		var newVal = prompt('Enter new relationship factor',relBubbles[r].val);
+		
+		if(newVal != null){
+			addRelOriginal(spaces[s1],spaces[s2],Number(newVal));
+			relBubbles[r].val = Number(newVal);
+			relBubbles[r].draw();
+		}
+	});
 }
 
 function relBubble(bubblePos, value, index1, index2){//parameters are position value, and the indices of the two spaces associated with it
@@ -113,8 +128,10 @@ function loadTable(){//marks spaces with bubbles on relCanvas
 	$('.tableRow').height(rowHeight);
 	relCanvas.width = $('#spaceList').width()-$('#listTable').width();
 	relCanvas.height = $('#listTable').height();
-	$('#relCanvas').css('top','0px');
-	$('#relCanvas').css('left',($('#listTable').width())+'px');
+	$('.canvas2').css('top','0px');
+	$('.canvas2').css('left',($('#listTable').width())+'px');
+	$('.canvas2').width(relCanvas.width);
+	$('.canvas2').height(relCanvas.height);
 	
 	var step = (relCanvas.height - $('#tableHeader').height())/spaces.length;
 	var startPos = [0, $('#tableHeader').height()];
@@ -158,6 +175,7 @@ function loadTable(){//marks spaces with bubbles on relCanvas
 	var spacePos = new Array();
 	var bubblePos = new Array();
 	
+	$('#relMap').html('');
 	for(var s = 0; s < spaces.length-1; s++){
 		// markPt(drawPos,rc);
 		// markPt(lineEnd,rc);
@@ -167,6 +185,12 @@ function loadTable(){//marks spaces with bubbles on relCanvas
 			//createnew relation Bubble here
 			relBubbles.push(new relBubble(bubblePos, relOriginal(spaces[s],spaces[s2]), s, s2));
 			relBubbles[relBubbles.length-1].draw();
+			
+			var radius = rowHeight/(2*Math.sqrt(2));
+			
+			$('#relMap').append('<area shape="circle" coords="'+bubblePos[0]+','+bubblePos[1]+','+radius+'" class="relMapBubble"'+
+									'id="'+(relBubbles.length-1)+'"'+
+									'alt="test"></area>');
 		}
 		drawPos[1] += step;
 		lineEnd = vSum(drawPos,lineDist(endPos,tableTip,drawPos));

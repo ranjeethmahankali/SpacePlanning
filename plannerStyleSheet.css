@@ -86,5 +86,7 @@ body{
 .canvas2{
 	position : absolute;
 	/*border : solid black 1px;*/
-	cursor : pointer;
+}
+.relMapBubble{
+	/*border : solid black 1px;*/
 }
