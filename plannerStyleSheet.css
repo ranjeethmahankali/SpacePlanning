@@ -83,7 +83,7 @@ body{
 	text-align : center;
 	margin : 0px;
 }
-#relCanvas{
+.canvas2{
 	position : absolute;
 	/*border : solid black 1px;*/
 	cursor : pointer;

@@ -13,6 +13,7 @@ var curSpace = -1;//the index of the currently selectedSpace
 var rowHeight = 50;
 var canvasOffset = 5;
 var relBubbles = new Array();
+var mousePos = new Array();//mouse click position
 
 function loadMouseEventHandlers(){
 	$('.spaceSizeData').click(function(){
@@ -45,32 +46,6 @@ function loadMouseEventHandlers(){
 	$('.spaceColorData').change(function(){
 		var index = Number(this.id);
 		spaces[index].color = $(this).val();
-	});
-	
-	$('#relCanvas').click(function(e){console.log('canvas clicked');
-		var mousePos = new Array();
-		mousePos[0] = e.pageX - this.offsetLeft;
-		mousePos[1] = e.pageY - this.offsetTop;
-		var radius = rowHeight/(2*Math.sqrt(2));
-		
-		console.log(mousePos);
-		markPt(mousePos,rc);
-		
-		bubbleLoop: for(var r = 0; r <  relBubbles.length; r++){
-			var dist = mod(vDiff(relBubbles[r].pos,mousePos));
-			if(dist < radius){
-				var s1 = relBubbles[r].s1;
-				var s2 = relBubbles[r].s2;
-				
-				var newVal = prompt('Enter a new relationship factor', relBubbles[r].val);
-				if(newVal != null){
-					addRelOriginal(spaces[s1],spaces[s2],Number(newVal));
-					relBubbles[r].val = Number(newVal);
-					relBubbles[r].draw();
-				}
-				break bubbleLoop;
-			}
-		}
 	});
 }
 
