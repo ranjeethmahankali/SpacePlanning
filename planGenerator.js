@@ -1,9 +1,5 @@
-var toolCanvas = document.getElementById('toolCanvas');
-var ct = toolCanvas.getContext('2d');
-
-var toolCanvas = document.getElementById('toolCanvas2');
-var ct2 = toolCanvas2.getContext('2d');
-ct2.strokeStyle = 'blue';
+var relCanvas = document.getElementById('relCanvas');
+var rc = relCanvas.getContext('2d');
 
 var nameInput = $('#spaceName');
 var spanInput = $('#spaceSize');
@@ -11,108 +7,98 @@ var areaInput = $('#spaceArea');
 var colorInput = $('#spaceColor');
 
 //mouse event handlers - begin
-var wasDragging = false;
-var mouseWasDown = false;
-var mouse1 = new Array();
-var mouse2 = new Array();
+var clickPos = new Array();
 
-var bubbleRadius = 20;//radius with which spaces are represented in the toolCanvas
 var curSpace = -1;//the index of the currently selectedSpace
+var rowHeight = 50;
+var canvasOffset = 5;
+var relBubbles = new Array();
 
-$('.canvas2').mousedown(function(e){
-	mouse1[0] = e.pageX - this.offsetLeft;
-	mouse1[1] = e.pageY - this.offsetTop;
+function loadMouseEventHandlers(){
+	$('.spaceSizeData').click(function(){
+		var index = Number(this.id);
+		var oldVal = $(this).text();
+		var newVal = prompt('Enter a new value', oldVal);
+		if(newVal != null){
+			spaces[index].meanSpan = Number(newVal);
+			$(this).text(newVal);
+		}
+	});
+	$('.spaceAreaData').click(function(){
+		var index = Number(this.id);
+		var oldVal = $(this).text();
+		var newVal = prompt('Enter a new value', oldVal);
+		if(newVal != null){
+			spaces[index].totArea = Number(newVal);
+			$(this).text(newVal);
+		}
+	});
+	$('.spaceNameData').click(function(){
+		var index = Number(this.id);
+		var oldVal = $(this).text();
+		var newVal = prompt('Enter a new value', oldVal);
+		if(newVal != null){
+			spaces[index].name = newVal;
+			$(this).text(newVal);
+		}
+	});
+	$('.spaceColorData').change(function(){
+		var index = Number(this.id);
+		spaces[index].color = $(this).val();
+	});
 	
-	mouseWasDown = true;
-	wasDragging = false;
-});
-$('.canvas2').mousemove(function(e){
-	if(mouseWasDown){
-		mouse2[0] = e.pageX - this.offsetLeft;
-		mouse2[1] = e.pageY - this.offsetTop;
+	$('#relCanvas').click(function(e){console.log('canvas clicked');
+		var mousePos = new Array();
+		mousePos[0] = e.pageX - this.offsetLeft;
+		mousePos[1] = e.pageY - this.offsetTop;
+		var radius = rowHeight/(2*Math.sqrt(2));
 		
-		wasDragging = true;
-	}
-});
-$('.canvas2').mouseup(function(e){
-	if(mouseWasDown && !wasDragging){
-		//click detected at mouse1
-		curSpace = -1;
-		var dist;
-		for(var s = 0; s < spaces.length; s++){
-			dist = mod(vDiff(mouse1,spaces[s].bubblePos));
-			if(dist < bubbleRadius){
-				//console.log(s);
-				curSpace = s;
-				break;
+		console.log(mousePos);
+		markPt(mousePos,rc);
+		
+		bubbleLoop: for(var r = 0; r <  relBubbles.length; r++){
+			var dist = mod(vDiff(relBubbles[r].pos,mousePos));
+			if(dist < radius){
+				var s1 = relBubbles[r].s1;
+				var s2 = relBubbles[r].s2;
+				
+				var newVal = prompt('Enter a new relationship factor', relBubbles[r].val);
+				if(newVal != null){
+					addRelOriginal(spaces[s1],spaces[s2],Number(newVal));
+					relBubbles[r].val = Number(newVal);
+					relBubbles[r].draw();
+				}
+				break bubbleLoop;
 			}
 		}
-		selectSpace(curSpace);
-	}else if(mouseWasDown && wasDragging){
-		//dragging detected from mouse 1 to mouse 2
-		var dist1, dist2;
-		var num1 = -1;
-		var num2 = -1;
-		// markPt(mouse1,ct2);
-		// markPt(mouse2,ct2);
-		for(var s = 0; s < spaces.length; s++){
-			dist1 = mod(vDiff(mouse1,spaces[s].bubblePos));
-			dist2 = mod(vDiff(mouse2,spaces[s].bubblePos));
-			if(dist1 < bubbleRadius){
-				num1 = s;
-			}
-			if(dist2 < bubbleRadius){
-				num2 = s;
-			}
-		}
-		if(num1 != -1 && num2 != -1){
-			//console.log(num1,num2);
-			loadRelation(num1,num2);
-		}
-	}
-	wasDragging = false;
-	mouseWasDown = false;
-});
-//mouse event handlers - end
-
-function selectSpace(s){//selects the space with index savePreferences
-	ct2.clearRect(0,0,toolCanvas2.width, toolCanvas2.height);
-	if(s == -1){return;}//this is when no space is clicked
-	
-	var rad = bubbleRadius +3;
-	
-	ct2.beginPath();
-	ct2.arc(spaces[s].bubblePos[0], spaces[s].bubblePos[1], rad, 0, 2*Math.PI);
-	ct2.stroke();
+	});
 }
 
-function loadRelation(s1, s2){
-	ct2.clearRect(0,0,toolCanvas2.width, toolCanvas2.height);
-	var rad = bubbleRadius +3;
+function relBubble(bubblePos, value, index1, index2){//parameters are position value, and the indices of the two spaces associated with it
+	this.pos = bubblePos;
+	this.val = value;
+	this.s1 = index1;
+	this.s2 = index2;
 	
-	ct2.beginPath();
-	ct2.arc(spaces[s1].bubblePos[0], spaces[s1].bubblePos[1], rad, 0, 2*Math.PI);
-	ct2.stroke();
-	
-	ct2.beginPath();
-	ct2.arc(spaces[s2].bubblePos[0], spaces[s2].bubblePos[1], rad, 0, 2*Math.PI);
-	ct2.stroke();
-	
-	ct2.beginPath();
-	ct2.moveTo(spaces[s1].bubblePos[0], spaces[s1].bubblePos[1]);
-	ct2.lineTo(spaces[s2].bubblePos[0], spaces[s2].bubblePos[1]);
-	ct2.stroke();
-	
-	var relF = relOriginal(spaces[s1], spaces[s2]);//current relationship Factor of the s1 and s2 pair
-	var newRelF = prompt("Enter new relationship factor", relF);
-	if(newRelF != null){addRelOriginal(spaces[s1], spaces[s2], Number(newRelF));}
-	ct2.clearRect(0,0,toolCanvas2.width, toolCanvas2.height);
+	this.draw = function(){
+		var radius = rowHeight/(2*Math.sqrt(2));
+		
+		rc.fillStyle = 'white';
+		rc.beginPath();
+		rc.arc(this.pos[0], this.pos[1], radius, 0, 2*Math.PI);
+		rc.fill();
+		
+		rc.textAlign = 'center';
+		rc.textBaseline = 'middle';
+		rc.font = "12px Arial"
+		rc.fillStyle = 'black';
+		rc.fillText(value,this.pos[0],this.pos[1]);
+	}
 }
 
 function resetSpace(sp){//resets the space sp to it's original condition that it was in before planning
 	sp.nodes = [];
-	sp.runs = [];//[4,5,50]
-	//sp.relations = new Array();
+	sp.runs = [];
 	
 	for(var r in sp.relationsOriginal){
 		sp.relations[sp.relationsOriginal.indexOf(r)] = r;
@@ -131,32 +117,94 @@ function resetSpace(sp){//resets the space sp to it's original condition that it
 	sp.lastPosCritPt = null;
 }
 
-function markSpaces(){//marks spaces with bubbles on toolCanvas
-	ct.clearRect(0,0,toolCanvas.width, toolCanvas.height);
-	
-	var num = spaces.length;
-	var angStep = 2*Math.PI/num;
-	var ang = 0;
-	var centerPos = [toolCanvas.width/2,toolCanvas.height/2];
-	var radVec = [0,0];//radius vector to be addded to the center to get the buble location
-	var bubblePos = [];
+function loadTable(){//marks spaces with bubbles on relCanvas
+	rc.clearRect(0,0,relCanvas.width, relCanvas.height);
+	$('#listTable').html('<tr id = "tableHeader">'+
+							'<th class = "headerValue" id = "colorColumn">Color</td>'+
+							'<th class = "headerValue" id = "sizeColumn">Size</td>'+
+							'<th class = "headerValue" id = "areaColumn">Area</td>'+
+							'<th class = "headerValue" id = "nameColumn">Name</td>'+
+							'</tr>');
 	
 	for(var s = 0; s < spaces.length; s++){
-		radVec = vPrd([Math.cos(ang),Math.sin(ang)],100);
-		bubblePos = vSum(centerPos, radVec);
-		spaces[s].bubblePos = bubblePos;
-		
-		//console.log(bubblePos,radVec);
-		ct.beginPath();
-		ct.arc(bubblePos[0],bubblePos[1],bubbleRadius,0,2*Math.PI);
-		ct.closePath();
-		ct.fillStyle = spaces[s].color;
-		ct.fill();
-		ang += angStep;
+		$('#listTable').append('<tr class="tableRow">'+
+								'<td><input type="color" name="'+s+'" id="'+s+'" value="'+spaces[s].color+'" class="spaceColorData"/></td>'+
+								'<td class="spaceSizeData" id="'+s+'">'+spaces[s].meanSpan+'</td>'+
+								'<td class="spaceAreaData" id="'+s+'">'+spaces[s].totArea+'</td>'+
+								'<td class="spaceNameData" id="'+s+'">'+spaces[s].name+'</td>'+
+								'</tr>');
 	}
+	
+	$('.tableRow').height(rowHeight);
+	relCanvas.width = $('#spaceList').width()-$('#listTable').width();
+	relCanvas.height = $('#listTable').height();
+	$('#relCanvas').css('top','0px');
+	$('#relCanvas').css('left',($('#listTable').width())+'px');
+	
+	var step = (relCanvas.height - $('#tableHeader').height())/spaces.length;
+	var startPos = [0, $('#tableHeader').height()];
+	var endPos = [0,relCanvas.height];
+	var tableTip = vSum(startPos,[(step*spaces.length)/2,(step*spaces.length)/2]);
+	
+	rc.lineWidth = 2;
+	rc.fillStyle = 'black';
+	rc.strokeStyle = 'black';
+	rc.beginPath();
+	rc.moveTo(startPos[0], startPos[1]);
+	rc.lineTo(tableTip[0], tableTip[1]);
+	rc.lineTo(endPos[0], endPos[1]);
+	rc.closePath();
+	rc.fill();
+	rc.stroke();
+	
+	var lineEnd = new Array();
+	var drawPos = startPos.slice();//cloning the array instead of passing it by reference
+	rc.strokeStyle = 'white';
+	
+	for(var s = 0; s <= spaces.length; s++){
+		lineEnd = vSum(drawPos,lineDist(endPos,tableTip,drawPos));
+		rc.beginPath();
+		rc.moveTo(drawPos[0],drawPos[1]);
+		rc.lineTo(lineEnd[0],lineEnd[1]);
+		//console.log(drawPos,bottomLine[0], bottomLine[1]);
+		
+		console.log(startPos);
+		lineEnd = vSum(drawPos, lineDist(startPos,tableTip,drawPos));
+		var test = lineDist(startPos, tableTip, drawPos);
+		rc.moveTo(drawPos[0],drawPos[1]);
+		rc.lineTo(lineEnd[0],lineEnd[1]);
+		rc.stroke();
+		
+		drawPos[1] += step;
+	}
+	
+	drawPos = vSum(startPos,[0,step/2]);
+	lineEnd = vSum(drawPos,lineDist(endPos,tableTip,drawPos));
+	var spacePos = new Array();
+	var bubblePos = new Array();
+	
+	for(var s = 0; s < spaces.length-1; s++){
+		// markPt(drawPos,rc);
+		// markPt(lineEnd,rc);
+		for(var s2 = s+1; s2 < spaces.length; s2++){
+			spacePos = vSum(drawPos,vPrd([0,step],(s2-s)));
+			bubblePos = vSum(spacePos,lineDist(drawPos,lineEnd,spacePos));
+			//createnew relation Bubble here
+			relBubbles.push(new relBubble(bubblePos, relOriginal(spaces[s],spaces[s2]), s, s2));
+			relBubbles[relBubbles.length-1].draw();
+		}
+		drawPos[1] += step;
+		lineEnd = vSum(drawPos,lineDist(endPos,tableTip,drawPos));
+	}
+	
+	loadMouseEventHandlers();
 }
 
 function addSpace(){
+	if(spaces.length >= 6){
+		alert('Sorry ! A maximum of 6 spaces is allowed in this version');
+		return;
+	}
 	var spaceName = nameInput.val();
 	var spaceSize = Number(spanInput.val());
 	var spaceArea = Number(areaInput.val());
@@ -170,7 +218,7 @@ function addSpace(){
 		alert('The selected color has been already used for another space\nPlease select a different color');
 	}else{
 		spaces.push(new space(spaceName,spaceSize,spaceArea,spaceColor));
-		markSpaces();
+		loadTable();
 	}
 }
 
@@ -211,10 +259,10 @@ function sortSpaces(){//sorts all spaces according to their preference Indices
 }
 
 //Demo starts
-spaces.push(new space('A',50,6000,'rgba(255,0,0,0.6)'));//red one
-spaces.push(new space('B',100,10000,'rgba(0,255,0,0.6)'));//green one
-spaces.push(new space('C',85,9000,'rgba(0,0,255,0.6)'));//blue one
-spaces.push(new space('D',50,24000,'rgba(0,255,255,0.6)'));//cyan one
+spaces.push(new space('A',50,6000,'#ff0000'));//red one
+spaces.push(new space('B',100,10000,'#00ff00'));//green one
+spaces.push(new space('C',85,9000,'#0000ff'));//blue one
+spaces.push(new space('D',50,24000,'#00ffff'));//cyan one
 
 addRelOriginal(spaces[0],spaces[1],1);
 addRelOriginal(spaces[1],spaces[2],1);
@@ -231,7 +279,7 @@ addRelOriginal(spaces[3],spaces[1],0.7);
 // addRelOriginal(D,B,0.7);
 //demo ends
 
-markSpaces();
+loadTable();
 var date = new Date();
 var t1 = 1000*date.getSeconds() + date.getMilliseconds();
 //Planning Starts

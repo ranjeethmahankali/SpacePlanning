@@ -117,7 +117,7 @@ function vDiff(vec1,vec2){//returns vector1-vector2 in that order
 }
 
 function lineDist(vec1,vec2,vec){//gives the perpendicular distance vector from point vec to line joining vec1 and vec2
-	var w = [vec2[0]-vec1[0],vec2[1]-vec1[1]];//console.log(w);//this is the vector along the lAnchor
+	var w = [vec2[0]-vec1[0],vec2[1]-vec1[1]];//console.log(w);//this is the vector along the line
 	var p = [vec[0]-vec1[0],vec[1]-vec1[1]];
 	var d = [vec1[0]+((dot(p,w)/Math.pow(mod(w),2))*w[0])-vec[0],vec1[1]+((dot(p,w)/Math.pow(mod(w),2))*w[1])-vec[1]]; //console.log(d);
 	return d;

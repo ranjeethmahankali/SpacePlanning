@@ -18,14 +18,14 @@ body{
 #baseCanvas {
 	z-index : 0;
 }
-.canvas2 {
+#spaceList {
 	position : absolute;
 	top : 2px;
 	left : 1006px;
-	height : 350px;
 	width : 350px;
 	margin : 0px;
-	border : solid red 1px;
+	/*border : solid red 1px;*/
+	padding : 0px;
 }
 #help_text{
 	text-align : center;
@@ -48,4 +48,43 @@ body{
 }
 .formElements{
 	margin : 5px;
+}
+#listTable{
+	border-collapse : collapse;
+	cursor : pointer;
+}
+#tableHeader{
+	background-color : black;
+	color : white;
+	font-size : 14px;
+	font-weight : bold;
+	text-align : center;
+}
+#tableHeader{
+	height : 20px;
+}
+.spaceColorData{
+	width : 25px;
+	margin : 0px;
+}
+.spaceSizeData{
+	width : 35px;
+	height : 20px;
+	margin : 0px;
+}
+.spaceAreaData{
+	width : 50px;
+	height : 20px;
+	margin : 0px;
+}
+.spaceNameData{
+	width : 50px;
+	height : 20px;
+	text-align : center;
+	margin : 0px;
+}
+#relCanvas{
+	position : absolute;
+	/*border : solid black 1px;*/
+	cursor : pointer;
 }

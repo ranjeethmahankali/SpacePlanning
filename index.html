@@ -11,8 +11,17 @@
 	<canvas id = "travelCanvas" class = "canvas" height = "600px" width = "1000px"></canvas>
 	<canvas id = "finalCanvas" class = "canvas" height = "600px" width = "1000px"></canvas>
 	
-	<canvas id = "toolCanvas" class = "canvas2" height = "350px" width = "350px"></canvas>
-	<canvas id = "toolCanvas2" class = "canvas2" height = "350px" width = "350px"></canvas>
+	<div id = "spaceList">
+		<table id = "listTable" border = "1">
+			<tr id = "tableHeader">
+				<th class = "headerValue" id = 'colorColumn'>Color</td>
+				<th class = "headerValue" id = 'sizeColumn'>Size</td>
+				<th class = "headerValue" id = 'areaColumn'>Area</td>
+				<th class = "headerValue" id = 'nameColumn'>Name</td>
+			</tr>
+		</table>
+		<canvas id = "relCanvas" class = "canvas2" height = "350px" width = "350px"></canvas>
+	</div>
 	
 	<div id = "toolContainer">
 		<button id = "runPlannerBtn" class="formElements" onclick="runPlanner()">Plan these Spaces</button>

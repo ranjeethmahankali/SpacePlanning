@@ -1,4 +1,3 @@
-
 var baseCanvas = document.getElementById('baseCanvas');
 var bc = baseCanvas.getContext('2d');
 bc.fillStyle = 'rgb(255,0,0)';
@@ -19,7 +18,7 @@ fc.lineWidth = 1;
 
 var reductionFactor = 0.1;
 var negAnchFactor = 0.2;
-var minLinkSize = 30;
+var minLinkSize = 30;//this many pixels wide connection is necessary for a space to be connected to itself
 var selfRelFactor = 1;
 var minGridSize = 5;
 
@@ -1279,7 +1278,8 @@ function headIsConnected(spc){if(spc.headPos.length){//tiny spaces can miss thro
 	}
 }
 
-function placeHead(spc, shwCritPt, showRoughWork){//places the head of spc at the nearest possible point from pos//2nd and 3rd parameters are bools whether to show roughwork or not
+function placeHead(spc, shwCritPt, showRoughWork){
+	// this fucntion places the head of spc at the nearest possible point from pos//2nd and 3rd parameters are bools whether to show roughwork or not
 	var maxIter = 200;
 	var i = 0;//while loop variable
 	while(i < maxIter){
