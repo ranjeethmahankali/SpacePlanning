@@ -281,7 +281,6 @@ spaces.push(new space('A',50,6000,'#ff0000'));//red one
 spaces.push(new space('B',100,10000,'#00ff00'));//green one
 spaces.push(new space('C',85,9000,'#0000ff'));//blue one
 spaces.push(new space('D',50,24000,'#00ffff'));//cyan one
-spaces.push(new space('E',50,5600,'#ff00ff'));//voilet one
 
 addRelOriginal(spaces[0],spaces[1],1);
 addRelOriginal(spaces[1],spaces[2],1);
@@ -289,8 +288,6 @@ addRelOriginal(spaces[2],spaces[0],-0.8);
 addRelOriginal(spaces[2],spaces[3],1);
 addRelOriginal(spaces[3],spaces[0],0.8);
 addRelOriginal(spaces[3],spaces[1],0.7);
-addRelOriginal(spaces[4],spaces[3],1);
-addRelOriginal(spaces[4],spaces[2],-0.5);
 
 // addRelOriginal(A,B,1);
 // addRelOriginal(B,C,0.7);
