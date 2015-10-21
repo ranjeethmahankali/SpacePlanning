@@ -1,6 +1,7 @@
 var baseCanvas = document.getElementById('baseCanvas');
 var bc = baseCanvas.getContext('2d');
 bc.fillStyle = 'rgb(255,0,0)';
+bc.globalAlpha = 0.8;
 bc.strokeStyle = 'black';
 bc.lineWidth = 2;
 
@@ -161,6 +162,7 @@ function space(name, mSpan, totAr, color){//constructor for "space" object
 	this.negAnchor = [];//point anchors of this space if any
 	this.maxNegAnchors = 2000;
 	this.prefIndex;
+	this.index = spaces.length;//stores the original index as this is added to the spaces array
 	
 	this.meanSpan = mSpan;//this is the preferred mean span
 	this.span = this.meanSpan;//this is the default or current span
@@ -801,7 +803,7 @@ function uSum(xx, yy, spc){
 			}
 		}
 	}
-	
+
 	for(var a = 0; a < spc.negAnchor.length; a++){
 		var vp = unitV(vDiff(spc.negAnchor[a][0],p));
 		vecSum[0] += vp[0]*spc.negAnchor[a][1];
@@ -998,8 +1000,10 @@ function critPt(spc,showRoughWork){//calculates the critical point and moves the
 	
 	x = xSum/n;
 	y = ySum/n;
+	
 	//console.log(n);
-	//sconsole.log([x,y]);
+	//console.log([x,y],n);
+	//console.log([xSum,ySum]);
 	var uSumPrev = [];
 	for(var itr=0; itr < 500; itr++ ){
 		if(showRoughWork){
@@ -1282,15 +1286,19 @@ function placeHead(spc, shwCritPt, showRoughWork){
 	// this fucntion places the head of spc at the nearest possible point from pos//2nd and 3rd parameters are bools whether to show roughwork or not
 	var maxIter = 200;
 	var i = 0;//while loop variable
-	while(i < maxIter){
-		if(shwCritPt){markPt(spc.critPt(showRoughWork),fc);}else{spc.critPt(showRoughWork);}
+	placeHeadLoop: while(i < maxIter){
+		if(shwCritPt){
+			markPt(spc.critPt(showRoughWork),fc);
+		}else{
+			spc.critPt(showRoughWork);
+		}
 		//console.log(spc.critPt());
 		//spc.critPt();
 		spc.align(showRoughWork);
 		//console.log(spc.headPos,headIsClear(spc.headPos,spc.span));
 		if(headIsClear(spc.headPos,spc.span)){
 			//console.log('Aligned after '+(i+1)+' attempts !');
-			break;
+			break placeHeadLoop;
 		}else{
 			var spDiff = spc.meanSpan*spc.spanFlex;
 			if(spDiff < 1){
@@ -1302,10 +1310,10 @@ function placeHead(spc, shwCritPt, showRoughWork){
 				spc.span -= spDiff;
 				spc.align(showRoughWork);
 	
-				while(spDiff >= 1){
+				spanChangeLoop: while(spDiff >= 1){
 					if(headIsClear(spc.headPos,spc.span)){//console.log('Yes at '+spc.span);
 						spDiff /= 2;
-						if(spDiff < 1){break;}
+						if(spDiff < 1){break spanChangeLoop;}
 						//console.log(spc.span+' + '+spDiff);
 						spc.span += spDiff;
 					}else{//console.log('No at '+spc.span);
@@ -1313,20 +1321,20 @@ function placeHead(spc, shwCritPt, showRoughWork){
 							spc.span = spc.meanSpan;
 							//spc.anchors.push([spc.headPos,-aR*Math.pow(aF,i)]);
 							spc.addNegAnchor(spc.headPos);
-							break;
+							break spanChangeLoop;
 						}else{
 							spDiff /= 2;
-							if(spDiff < 1){break;}
+							if(spDiff < 1){break spanChangeLoop;}
 							//console.log(spc.span+' - '+spDiff);
 							spc.span -= spDiff;
 						}	
 					}
-					spc.align(showRoughWork);
 				}
+				spc.align(showRoughWork);
 			}
 		}
 		i++;
-		if(i == maxIter){console.log('I cannot place the Head. I fucking give up !!');}
+		if(i == maxIter){console.log('I cannot place the Head. I give up !!');}
 	}
 	
 	if(i < maxIter){
@@ -1427,7 +1435,7 @@ function moveHead(spc, showRoughWork){
 	}
 }
 
-function planSpace(spc,rNum,shwCritPt, showRoughWork){//plans space spc but only rNum runs
+function planSpace(spc,rNum,shwCritPt, showRoughWork){//plans space spc but only rNum runs maximum
 	spc.posCritPt(showRoughWork);
 	//spc.hPos.push(spc.critPt());
 	spc.placeHead(shwCritPt, showRoughWork);

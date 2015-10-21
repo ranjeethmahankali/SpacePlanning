@@ -160,11 +160,16 @@ function markPt(pos, ctx){//marks the point 'pos' on the context ctx with an 'x'
 }
 
 function unitV(vec){//returns a unit vector parallel to vec
-	var uV = [];
-	uV[0] = vec[0]/mod(vec);
-	uV[1] = vec[1]/mod(vec);
-	
-	return uV;
+	var modV = mod(vec);
+	if(modV == 0){
+		return [0,0];
+	}else{
+		var uV = [];
+		uV[0] = vec[0]/modV;
+		uV[1] = vec[1]/modV;
+		
+		return uV;
+	}
 }
 
 function arr2dContains(ar, val){//checks if the array ar contains the element val. but works only for 2d arrays

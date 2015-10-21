@@ -22,7 +22,7 @@ function loadMouseEventHandlers(){
 		var newVal = prompt('Enter a new value', oldVal);
 		if(newVal != null){
 			spaces[index].meanSpan = Number(newVal);
-			$(this).text(newVal);
+			loadTable();
 		}
 	});
 	$('.spaceAreaData').click(function(){
@@ -31,18 +31,18 @@ function loadMouseEventHandlers(){
 		var newVal = prompt('Enter a new value', oldVal);
 		if(newVal != null){
 			spaces[index].totArea = Number(newVal);
-			$(this).text(newVal);
+			loadTable();
 		}
 	});
-	$('.spaceNameData').click(function(){
-		var index = Number(this.id);
-		var oldVal = $(this).text();
-		var newVal = prompt('Enter a new value', oldVal);
-		if(newVal != null){
-			spaces[index].name = newVal;
-			$(this).text(newVal);
-		}
-	});
+	// $('.spaceNameData').click(function(){//cannot change name of space because all relations are stored in terms of the names
+		// var index = Number(this.id);
+		// var oldVal = $(this).text();
+		// var newVal = prompt('Enter a new value', oldVal);
+		// if(newVal != null){
+			// spaces[index].name = newVal;
+			// loadTable();
+		// }
+	// });
 	$('.spaceColorData').change(function(){
 		var index = Number(this.id);
 		spaces[index].color = $(this).val();
@@ -64,9 +64,10 @@ function loadMouseEventHandlers(){
 	});
 }
 
-function relBubble(bubblePos, value, index1, index2){//parameters are position value, and the indices of the two spaces associated with it
+function relBubble(bubblePos, value, index1, index2){//constructor for buuble object
+	//parameters are position value, and the indices of the two spaces associated with it
 	this.pos = bubblePos;
-	this.val = value;
+	this.val = roundNum(value,2);
 	this.s1 = index1;
 	this.s2 = index2;
 	
@@ -82,29 +83,36 @@ function relBubble(bubblePos, value, index1, index2){//parameters are position v
 		rc.textBaseline = 'middle';
 		rc.font = "12px Arial"
 		rc.fillStyle = 'black';
-		rc.fillText(value,this.pos[0],this.pos[1]);
+		rc.fillText(this.val,this.pos[0],this.pos[1]);
 	}
 }
 
-function resetSpace(sp){//resets the space sp to it's original condition that it was in before planning
-	sp.nodes = [];
-	sp.runs = [];
-	
-	for(var r in sp.relationsOriginal){
-		sp.relations[sp.relationsOriginal.indexOf(r)] = r;
+function resetSpaces(){//resets all spaces to their original state
+	for(var s = 0; s < spaces.length; s++){
+		spaces[s].nodes = [];
+		spaces[s].runs = [];
+		//spaces[s].relations = new Array();
+		
+		for(var s2 = 0; s2 < spaces.length; s2++){
+			if(s2 == s){continue;}
+			var r = relOriginal(spaces[s],spaces[s2]);
+			addRelOriginal(spaces[s],spaces[s2],r);
+		}
+		
+		spaces[s].negAnchor = [];//point anchors of this space if any
+		spaces[s].maxNegAnchors = 2000;
+		spaces[s].prefIndex = null;
+		
+		spaces[s].span = spaces[s].meanSpan;//this is the default or current span
+		spaces[s].spanFlex = 0.3;//this is the flexibility of span
+		
+		spaces[s].headPos = [];//position of the drawing head
+		spaces[s].hPos = [];//array of various head Positions while planning and mving around
+		spaces[s].lastCritPt = null;
+		spaces[s].lastPosCritPt = null;
 	}
 	
-	sp.negAnchor = [];//point anchors of this space if any
-	sp.maxNegAnchors = 2000;
-	sp.prefIndex = null;
-	
-	sp.span = sp.meanSpan;//this is the default or current span
-	sp.spanFlex = 0.3;//this is the flexibility of span
-	
-	sp.headPos = [];//position of the drawing head
-	sp.hPos = [];//array of various head Positions while planning and mving around
-	sp.lastCritPt = null;
-	sp.lastPosCritPt = null;
+	unSortSpaces();
 }
 
 function loadTable(){//marks spaces with bubbles on relCanvas
@@ -158,9 +166,7 @@ function loadTable(){//marks spaces with bubbles on relCanvas
 		rc.beginPath();
 		rc.moveTo(drawPos[0],drawPos[1]);
 		rc.lineTo(lineEnd[0],lineEnd[1]);
-		//console.log(drawPos,bottomLine[0], bottomLine[1]);
 		
-		console.log(startPos);
 		lineEnd = vSum(drawPos, lineDist(startPos,tableTip,drawPos));
 		var test = lineDist(startPos, tableTip, drawPos);
 		rc.moveTo(drawPos[0],drawPos[1]);
@@ -257,11 +263,25 @@ function sortSpaces(){//sorts all spaces according to their preference Indices
 	}
 }
 
+function unSortSpaces(){//sorts spaces back accordin to their originall order
+	var tempSpace;
+	for(var a = 0; a < spaces.length-1; a++){
+		for(var s = 0; s < spaces.length-1-a; s++){
+			if(spaces[s].index > spaces[s+1].index){
+				tempSpace = spaces[s];
+				spaces[s] = spaces[s+1];
+				spaces[s+1] = tempSpace;
+			}
+		}
+	}
+}
+
 //Demo starts
 spaces.push(new space('A',50,6000,'#ff0000'));//red one
 spaces.push(new space('B',100,10000,'#00ff00'));//green one
 spaces.push(new space('C',85,9000,'#0000ff'));//blue one
 spaces.push(new space('D',50,24000,'#00ffff'));//cyan one
+spaces.push(new space('E',50,5600,'#ff00ff'));//voilet one
 
 addRelOriginal(spaces[0],spaces[1],1);
 addRelOriginal(spaces[1],spaces[2],1);
@@ -269,6 +289,8 @@ addRelOriginal(spaces[2],spaces[0],-0.8);
 addRelOriginal(spaces[2],spaces[3],1);
 addRelOriginal(spaces[3],spaces[0],0.8);
 addRelOriginal(spaces[3],spaces[1],0.7);
+addRelOriginal(spaces[4],spaces[3],1);
+addRelOriginal(spaces[4],spaces[2],-0.5);
 
 // addRelOriginal(A,B,1);
 // addRelOriginal(B,C,0.7);
@@ -279,18 +301,18 @@ addRelOriginal(spaces[3],spaces[1],0.7);
 //demo ends
 
 loadTable();
-var date = new Date();
-var t1 = 1000*date.getSeconds() + date.getMilliseconds();
-//Planning Starts
-//for(var s in spaces){console.log(spaces[s].name);}
+renderCanvas();
+
 function runPlanner(){
+	var date = new Date();
+	var t1 = 1000*date.getSeconds() + date.getMilliseconds();
+	
 	if(spaces.length == 0){
 		alert('No spaces added !');
 		return;
 	}
-	for(var s = 0; s < spaces.length; s++){
-		resetSpace(spaces[s]);
-	}
+	
+	resetSpaces();
 	sortSpaces();
 	//for(var s in spaces){console.log(spaces[s].name, spaces[s].prefIndex);}
 	var runLength = spaces[0].totArea/spaces[0].meanSpan;//console.log(runLength);
@@ -306,10 +328,11 @@ function runPlanner(){
 	for(var spcNum = 1; spcNum < spaces.length; spcNum++){
 		planSpace(spaces[spcNum],10, false, false);
 	}
+	
 	renderCanvas();
+	unSortSpaces();
+	
+	date = new Date();
+	var t2 = 1000*date.getSeconds() + date.getMilliseconds();
+	console.log('Runtime : '+(t2-t1)+' ms');
 }
-date = new Date();
-var t2 = 1000*date.getSeconds() + date.getMilliseconds();
-console.log('Runtime : '+(t2-t1)+' ms');
-//planning ends here so measuring runtime till here
-renderCanvas();
