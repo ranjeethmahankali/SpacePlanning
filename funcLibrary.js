@@ -1,5 +1,4 @@
 //function Library - starts
-
 function dist( x1, y1, x2, y2){// this is the distance function
 		var distance = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 		return distance;
