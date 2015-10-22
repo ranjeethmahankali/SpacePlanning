@@ -75,9 +75,12 @@ function relBubble(bubblePos, value, index1, index2){//constructor for buuble ob
 		var radius = rowHeight/(2*Math.sqrt(2));
 		
 		rc.fillStyle = 'white';
+		rc.strokeStyle = 'black';
+		rc.lineWidth = 1;
 		rc.beginPath();
 		rc.arc(this.pos[0], this.pos[1], radius, 0, 2*Math.PI);
 		rc.fill();
+		rc.stroke();
 		
 		rc.textAlign = 'center';
 		rc.textBaseline = 'middle';
