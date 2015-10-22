@@ -6,7 +6,7 @@ body{
 	height : 600px;
 	width : 1000px;
 	margin : 2px;
-	border : solid red 1px;
+	border : solid black 1px;
 	position : absolute;
 }
 #toolContainer {
