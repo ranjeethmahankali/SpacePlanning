@@ -324,6 +324,8 @@ function runPlanner(){
 
 	spaces[0].nodes = [e1,e2];
 	spaces[0].runs = [[0,1,spaces[0].meanSpan]];
+	
+	//console.log('Finished Planning '+spaces[0].name);
 
 	for(var spcNum = 1; spcNum < spaces.length; spcNum++){
 		planSpace(spaces[spcNum],10, false, false);

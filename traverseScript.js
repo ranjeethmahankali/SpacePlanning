@@ -1449,7 +1449,7 @@ function planSpace(spc,rNum,shwCritPt, showRoughWork){//plans space spc but only
 		lv++;
 		//renderCanvas();
 	}
-	console.log('Finished Planning '+spc.name);
+	//console.log('Finished Planning '+spc.name);
 	//if(shwCritPt){fc.fillRect(spc.headPos[0]-0.5*spc.span, spc.headPos[1]-0.5*spc.span, spc.span, spc.span);}
 }
 
